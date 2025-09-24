@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   try {
     const decoded = jwt.verify(token, SECRET);
     return NextResponse.json({ isLoggedIn: true, user: decoded });
-  } catch (err) {
+  } catch (err: any) {
     return NextResponse.json({ isLoggedIn: false });
   }
 }

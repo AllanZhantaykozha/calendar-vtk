@@ -67,7 +67,7 @@ export async function PUT(req: Request) {
     });
 
     return NextResponse.json(updated);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при обновлении события" }, { status: 500 });
   }
@@ -87,7 +87,7 @@ export async function DELETE(req: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при удалении события" }, { status: 500 });
   }

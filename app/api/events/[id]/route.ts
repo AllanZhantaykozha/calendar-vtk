@@ -12,15 +12,16 @@ function verifyToken(req: Request) {
 }
 
 // Редактирование
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const decoded = verifyToken(req);
     if (decoded.role !== "admin") {
       return NextResponse.json({ error: "Нет прав" }, { status: 403 });
     }
 
     const body = await req.json();
-    events = events.map((ev) => (ev.id === params.id ? { ...ev, ...body } : ev));
+    events = events.map((ev) => (ev.id === id ? { ...ev, ...body } : ev));
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
@@ -29,14 +30,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // Удаление
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
+
     const decoded = verifyToken(req);
     if (decoded.role !== "admin") {
       return NextResponse.json({ error: "Нет прав" }, { status: 403 });
     }
 
-    events = events.filter((ev) => ev.id !== params.id);
+    events = events.filter((ev) => ev.id !== id);
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

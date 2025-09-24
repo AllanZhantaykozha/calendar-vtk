@@ -20,7 +20,7 @@ export default function AdminPanel() {
   // State for categories
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null); // For editing categories
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function AdminPanel() {
         return res.json();
       })
       .then((data) => setEvents(data))
-      .catch((err) => {
+      .catch((err: Error) => {
         console.error("Ошибка загрузки мероприятий:", err);
         setError("Не удалось загрузить мероприятия");
       });
@@ -47,7 +47,7 @@ export default function AdminPanel() {
         setCategories(data);
         if (data.length > 0) setCategoryId(data[0].id);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         console.error("Ошибка загрузки категорий:", err);
         setError("Не удалось загрузить категории");
       });
@@ -95,10 +95,18 @@ export default function AdminPanel() {
       }
 
       resetForm();
-      const updated = await fetch("/api/events").then((res) => res.json());
+      const updated = await fetch("/api/events").then((res) => {
+        if (!res.ok) throw new Error("Ошибка обновления списка мероприятий");
+        return res.json();
+      });
       setEvents(updated);
-    } catch (error: any) {
-      setError(error.message || "Ошибка сохранения мероприятия");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Ошибка сохранения мероприятия";
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -114,7 +122,6 @@ export default function AdminPanel() {
 
     try {
       if (editingCategory) {
-        // Update category
         const res = await fetch("/api/category", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -126,7 +133,6 @@ export default function AdminPanel() {
         }
         toast.success("Категория обновлена!");
       } else {
-        // Create category
         const res = await fetch("/api/category", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -139,13 +145,21 @@ export default function AdminPanel() {
         toast.success("Категория добавлена!");
       }
 
-      const updated = await fetch("/api/category").then((res) => res.json());
+      const updated = await fetch("/api/category").then((res) => {
+        if (!res.ok) throw new Error("Ошибка обновления списка категорий");
+        return res.json();
+      });
       setCategories(updated);
       setNewCategory("");
       setEditingCategory(null);
       if (updated.length > 0 && !categoryId) setCategoryId(updated[0].id);
-    } catch (err: any) {
-      setError(err.message || "Ошибка при обработке категории");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Ошибка при обработке категории";
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -163,13 +177,19 @@ export default function AdminPanel() {
         throw new Error(errorData.error || "Ошибка при удалении категории");
       }
 
-      const updated = await fetch("/api/category").then((res) => res.json());
+      const updated = await fetch("/api/category").then((res) => {
+        if (!res.ok) throw new Error("Ошибка обновления списка категорий");
+        return res.json();
+      });
       setCategories(updated);
       if (categoryId === id) setCategoryId(updated[0]?.id || "");
       setEditingCategory(null);
       toast.success("Категория удалена!");
-    } catch (err: any) {
-      setError(err.message || "Ошибка удаления категории");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Ошибка удаления категории";
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -213,23 +233,32 @@ export default function AdminPanel() {
         throw new Error(errorData.error || "Ошибка при удалении события");
       }
 
-      const updated = await fetch("/api/events").then((res) => res.json());
+      const updated = await fetch("/api/events").then((res) => {
+        if (!res.ok) throw new Error("Ошибка обновления списка мероприятий");
+        return res.json();
+      });
       setEvents(updated);
       if (selectedEvent && selectedEvent.id === id) resetForm();
       toast.success("Мероприятие удалено!");
-    } catch (err: any) {
-      console.error("Ошибка удаления:", err);
-      setError(err.message || "Ошибка удаления мероприятия");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Ошибка удаления мероприятия";
+      setError(message);
+      toast.error(message);
     }
   };
 
   // Logout
   const handleLogout = async () => {
     try {
-      await fetch("/api/logout", { method: "POST" });
+      const res = await fetch("/api/logout", { method: "POST" });
+      if (!res.ok) throw new Error("Ошибка выхода из системы");
       router.replace("/login");
-    } catch (err) {
-      setError("Не удалось выйти из системы");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Не удалось выйти из системы";
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -402,7 +431,7 @@ export default function AdminPanel() {
             </form>
           </div>
 
-          {/* Event list */}
+          {/* Event and Category lists */}
           <div className="w-full lg:w-1/3">
             <h2 className="text-xl font-bold text-gray-800 mb-6">
               Список мероприятий
@@ -444,11 +473,10 @@ export default function AdminPanel() {
               )}
             </div>
 
-            {/* Category list */}
             <h2 className="text-xl font-bold text-gray-800 my-6">
               Список категорий
             </h2>
-            <div className="bg-white p-6 rounded-lg shadow-md  h-[400px] overflow-y-auto ">
+            <div className="bg-white p-6 rounded-lg shadow-md h-[400px] overflow-y-auto">
               {categories.length === 0 ? (
                 <p className="text-gray-500 text-center">Нет категорий</p>
               ) : (

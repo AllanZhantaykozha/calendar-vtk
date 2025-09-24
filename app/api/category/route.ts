@@ -9,7 +9,7 @@ export async function GET() {
       orderBy: { name: "asc" },
     });
     return NextResponse.json(categories);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при получении категорий" }, { status: 500 });
   }
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       },
     });
     return NextResponse.json(newCategory, { status: 201 });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при создании категории" }, { status: 500 });
   }
@@ -66,7 +66,7 @@ export async function PUT(req: Request) {
       data: { name },
     });
     return NextResponse.json(updatedCategory);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при обновлении категории" }, { status: 500 });
   }
@@ -96,7 +96,7 @@ export async function DELETE(req: Request) {
       where: { id },
     });
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ error: "Ошибка при удалении категории" }, { status: 500 });
   }
