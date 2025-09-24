@@ -9,8 +9,7 @@ export async function GET() {
       include: { category: true }, // Include category data in the response
     });
     return NextResponse.json(events);
-  } catch (err) {
-    console.error(err);
+  } catch (err: unknown) {
     return NextResponse.json({ error: "Ошибка при получении событий" }, { status: 500 });
   }
 }
@@ -37,8 +36,7 @@ export async function POST(req: Request) {
       },
     });
     return NextResponse.json(newEvent, { status: 201 });
-  } catch (err) {
-    console.error(err);
+  } catch {
     return NextResponse.json({ error: "Ошибка при создании события" }, { status: 500 });
   }
 }
@@ -67,8 +65,7 @@ export async function PUT(req: Request) {
     });
 
     return NextResponse.json(updated);
-  } catch (err: any) {
-    console.error(err);
+  } catch {
     return NextResponse.json({ error: "Ошибка при обновлении события" }, { status: 500 });
   }
 }
@@ -87,8 +84,7 @@ export async function DELETE(req: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error(err);
+  } catch {
     return NextResponse.json({ error: "Ошибка при удалении события" }, { status: 500 });
   }
 }

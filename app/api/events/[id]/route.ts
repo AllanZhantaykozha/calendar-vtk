@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { Event } from "@/components/types/event.type";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-let events: any[] = [];
+let events: Event[] = [];
 
 function verifyToken(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -24,8 +25,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     events = events.map((ev) => (ev.id === id ? { ...ev, ...body } : ev));
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "Ошибка при обновлении мероприятия" }, { status: 401 });
   }
 }
 
@@ -42,7 +43,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     events = events.filter((ev) => ev.id !== id);
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "Ошибка при удаление мероприятия" }, { status: 401 });
   }
 }
