@@ -6,7 +6,7 @@ const SECRET = process.env.JWT_SECRET || "supersecretkey";
 export async function POST(req: Request) {
   const { password } = await req.json();
 
-  if (password === "admin123") {
+  if (password === "0200") {
     const token = jwt.sign({ role: "admin" }, SECRET, { expiresIn: "1h" });
 
     const res = NextResponse.json({ success: true });
