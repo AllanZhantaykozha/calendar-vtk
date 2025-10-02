@@ -69,21 +69,23 @@ export default function Home() {
     fetchCategories();
   }, [router]);
 
-  const filteredEvents = events.filter((event) => {
-    const matchesCategory =
-      category === "all" || event.category.name === category;
-    const matchesTitle = event.title
-      .toLowerCase()
-      .includes(searchTitle.toLowerCase());
-    const eventDate = new Date(event.date);
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
+  const filteredEvents = [...events]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .filter((event) => {
+      const matchesCategory =
+        category === "all" || event.category.name === category;
+      const matchesTitle = event.title
+        .toLowerCase()
+        .includes(searchTitle.toLowerCase());
+      const eventDate = new Date(event.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
 
-    const matchesDate =
-      (!start || eventDate >= start) && (!end || eventDate <= end);
+      const matchesDate =
+        (!start || eventDate >= start) && (!end || eventDate <= end);
 
-    return matchesCategory && matchesTitle && matchesDate;
-  });
+      return matchesCategory && matchesTitle && matchesDate;
+    });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
